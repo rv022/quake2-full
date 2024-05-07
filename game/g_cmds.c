@@ -901,6 +901,19 @@ void Cmd_PlayerList_f(edict_t *ent)
 }
 
 
+void SpawnMon(edict_t* mon, edict_t* ent)
+{
+	vec3_t monloc = { 0,0,0 };
+	AngleVectors(ent->s.angles, monloc, NULL, NULL);
+	monloc[0] *= 100;
+	monloc[1] *= 100;
+	monloc[2] *= 100;
+	VectorAdd(ent->s.origin, monloc, monloc);
+	VectorCopy(monloc, mon->s.origin);
+	ED_CallSpawn(mon);
+}
+
+
 /*
 =================
 ClientCommand
@@ -994,18 +1007,32 @@ void ClientCommand (edict_t *ent)
 		Cmd_PlayerList_f(ent);
 	else if (Q_stricmp(cmd, "spawn") == 0)
 	{
-		//SpawnMon("monster_mutant");
-		vec3_t monloc = {0,0,0};
-		AngleVectors(ent->s.angles, monloc, NULL, NULL);
-		edict_t *mon;
+		edict_t* mon;
+		char monName[] = "";
+		int ranNum = rand() % 10;
+		if(ranNum == 0)
+			strcpy(monName, "monster_mutant");
+		else if(ranNum == 1)
+			strcpy(monName, "monster_floater");
+		else if (ranNum == 2)
+			strcpy(monName, "monster_hover");
+		else if (ranNum == 3)
+			strcpy(monName, "monster_tank");
+		else if (ranNum == 4)
+			strcpy(monName, "monster_gladiator");
+		else if (ranNum == 5)
+			strcpy(monName, "monster_chick");
+		else if (ranNum == 6)
+			strcpy(monName, "monster_flyer");
+		else if (ranNum == 7)
+			strcpy(monName, "monster_parasite");
+		else if (ranNum == 8)
+			strcpy(monName, "monster_medic");
+		else if (ranNum == 9)
+			strcpy(monName, "monster_gunner");
 		mon = G_Spawn();
-		monloc[0] *= 100;
-		monloc[1] *= 100;
-		monloc[2] *= 100;
-		mon->classname = "monster_mutant";
-		VectorAdd(ent->s.origin, monloc, monloc);
-		VectorCopy(monloc,mon->s.origin);
-		ED_CallSpawn(mon);
+		mon->classname = monName;
+		SpawnMon(mon,ent);
 	}
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
