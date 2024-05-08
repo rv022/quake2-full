@@ -27,16 +27,22 @@ int monNum;
 char capturedMonName[] = "";
 bool canSpawnMon = true;
 int enemyHealth_amount = 100;
+char enemyHealthText[] = "";
 bool inBattle = false;
 int enemyAttack = 1;
 int attackPower = 1;
-int wins = 0;
+bool wins = false;
+bool pb = false;
+bool wb = false;
+bool ae = false;
+bool gs = false;
+bool om = false;
 bool start = true;
 bool enemyProtection = false;
 bool Protection = false;
+bool bProtection = false;
 char message[] = "";
 char enemyMessage[] = "";
-int brokenProtection = false;
 
 char *ClientTeam (edict_t *ent)
 {
@@ -957,56 +963,81 @@ void SpawnCapturedMon(edict_t* capturedMon, edict_t* ent)
 	ED_CallSpawn(capturedMon);
 }
 
-void enemyTurn(edict_t* ent, char move[])
+void enemyTurn(edict_t* ent, int movenum)
 {
 	//if (inBattle == 1)
 	//{
-		int enemyDecision = rand() % 4;
+	if (movenum == 0)
+		strcpy(message, "You used takle! ");
+	else if (movenum == 1)
+		strcpy(message, "You used Prtct! ");
+	else if (movenum == 2)
+		strcpy(message, "You used Growl! ");
+	else if (movenum == 3)
+		strcpy(message, "You used Swdce! ");
+	else if (movenum == 4)
+		strcpy(message, "You used PB! ");
+	else if (movenum == 5)
+		strcpy(message, "You used WB! ");
+	else if (movenum == 6)
+		strcpy(message, "You used AE! ");
+	else if (movenum == 7)
+		strcpy(message, "You used GS! ");
+	else if (movenum == 8)
+		strcpy(message, "You used OM! ");
+	int enemyDecision = rand() % 4;
 		if (enemyDecision == 0)
 		{
 			//enemy
-			strcpy(enemyMessage, "They used tackle!");
-			strcat(move, enemyMessage);
-			gi.centerprintf(ent, move);
+			sprintf(enemyHealthText, "%i", enemyHealth_amount);
+			strcat(message, "They used takle!");
+			strcat(message, enemyHealthText);
+			gi.centerprintf(ent, message);
 			if (!Protection)
 			{
 				ent->health -= abs((25 + enemyAttack));
+				if (ent->health <= 0)
+					Cmd_Kill_f(ent);
 			}
 			else
 				Protection = false;
 		}
 		if (enemyDecision == 1)
 		{
-			if (brokenProtection)
+			if (!bProtection)
 			{
 				//enemy
-				strcpy(enemyMessage, "They couldn't use protect!");
-				strcat(move, enemyMessage);
-				gi.centerprintf(ent, move);
-			}
-			else
-			{
-				//enemy
-				strcpy(enemyMessage, "They used protect!");
-				strcat(move, enemyMessage);
-				gi.centerprintf(ent, move);
+				sprintf(enemyHealthText, "%i", enemyHealth_amount);
+				strcat(message, "They used prtct!");
+				strcat(message, enemyHealthText);
+				gi.centerprintf(ent, message);
 				enemyProtection = true;
+			}
+			else if(bProtection)
+			{
+				//enemy
+				sprintf(enemyHealthText, "%i", enemyHealth_amount);
+				strcat(message, "couldn't prtct!");
+				strcat(message, enemyHealthText);
+				gi.centerprintf(ent, message);
 			}
 		}
 		if (enemyDecision == 2)
 		{
 			//enemy
-			strcpy(enemyMessage, "They used swords dance!");
-			strcat(move, enemyMessage);
-			gi.centerprintf(ent, move);
+			sprintf(enemyHealthText, "%i", enemyHealth_amount);
+			strcat(message, "They used swdce!");
+			strcat(message, enemyHealthText);
+			gi.centerprintf(ent, message);
 			enemyAttack += 10;
 		}
 		if (enemyDecision == 3)
 		{
 			//enemy
-			strcpy(enemyMessage, "They used growl!");
-			strcat(move, enemyMessage);
-			gi.centerprintf(ent, move);
+			sprintf(enemyHealthText, "%i", enemyHealth_amount);
+			strcat(message, "They used growl!");
+			strcat(message, enemyHealthText);
+			gi.centerprintf(ent, message);
 			attackPower -= 10;
 		}
 	//
@@ -1016,56 +1047,44 @@ void startQuakeBattle(edict_t* ent)
 {
 	//if (inBattle==0)
 	//{
+		enemyProtection = false;
+		Protection = false;
+		bProtection = false;
 		strcpy(message, "Battle Start");
 		gi.centerprintf(ent, message);
 		enemyHealth_amount = 100;
 		//inBattle = 1;
 		enemyAttack = 1;
 		attackPower = 1;
-		enemyProtection = false;
-		Protection = false;
-		brokenProtection = false;
 	//}
 }
-/*
-void shopRewards()
-{
-	idPlayer* player;
-	player = gameLocal.GetLocalPlayer();
-	if (wins == 1 && player->health == 100)
-		player->GiveItem("weapon_nailgun");
-	if (wins == 2 && player->health == 100)
-		player->GiveItem("weapon_rocketlauncher");
-	if (wins == 3 && player->health == 100)
-		player->GiveItem("weapon_railgun");
-	if (wins == 4 && player->health == 100)
-		player->GiveItem("weapon_lightninggun");
-	if (wins == 5 && player->health == 100)
-		player->GiveItem("weapon_napalmgun");
-}
-*/
+
+
 void protectionBreaker(edict_t* ent)
 {
-	strcpy(message, "Protection breaker used!");
-	brokenProtection = true;
-	enemyTurn(ent, message);
-	enemyTurn(ent, message);
+	if (pb == true)
+	{
+		strcpy(message, "Protection breaker used!");
+		bProtection = true;
+		enemyTurn(ent, 4);
+		enemyTurn(ent, 4);
+	}
 }
 
 void willBreaker(edict_t* ent)
 {
 	strcpy(message, "Will breaker used!");
 	enemyAttack -= 25;
-	enemyTurn(ent, message);
-	enemyTurn(ent, message);
+	enemyTurn(ent, 5);
+	enemyTurn(ent, 5);
 }
 
 void attackEnhancer(edict_t* ent)
 {
 	strcpy(message, "Attack enhancer used!");
 	attackPower += 25;
-	enemyTurn(ent, message);
-	enemyTurn(ent, message);
+	enemyTurn(ent, 6);
+	enemyTurn(ent, 6);
 }
 
 
@@ -1073,29 +1092,28 @@ void geminiSplit(edict_t* ent)
 {
 	strcpy(message, "Gemini split used!");
 	enemyHealth_amount -= abs((2 * (25 + attackPower)));
-	enemyTurn(ent, message);
-	enemyTurn(ent, message);
+	enemyTurn(ent, 7);
+	enemyTurn(ent, 7);
 }
 
 void olympicMead(edict_t* ent)
 {
 	strcpy(message, "Olympic mead used!");
 	ent->health = 200;
-	enemyTurn(ent,message);
-	enemyTurn(ent,message);
+	enemyTurn(ent,8);
+	enemyTurn(ent,8);
 }
 void Tackle(edict_t* ent)
 {
 	//if (inBattle == 1) {
-		char tackle[] = "You used tackle!";
 		if (enemyHealth_amount > 0 && !enemyProtection)
 		{
 			enemyHealth_amount -= abs(25 + attackPower);
 			if (enemyHealth_amount <= 0)
 			{
 				strcpy(message, "You won!");
-				wins += 1;
 				gi.centerprintf(ent, message);
+				wins = true;
 				//strcpy(enemyMessage, "");
 				//UpdateEnemyBattleInfo(player->hud);
 				inBattle = 0;
@@ -1103,21 +1121,21 @@ void Tackle(edict_t* ent)
 				//spawnWildMon();
 				canSpawnMon = 1;
 			}
-			enemyTurn(ent,tackle);
+			enemyTurn(ent,0);
 		}
 		else if (enemyProtection)
 		{
 			enemyProtection = false;
-			enemyTurn(ent,message);
+			enemyTurn(ent,0);
 		}
 		else
 		{
 			strcpy(message, "You won!");
-			wins += 1;
 			gi.centerprintf(ent, message);
+			wins = true;
 			//strcpy(enemyMessage, "");
 			//UpdateEnemyBattleInfo(player->hud);
-			inBattle = 0;
+			//inBattle = 0;
 			despawnAll();
 			//spawnWildMon();
 			canSpawnMon = 1;
@@ -1130,7 +1148,7 @@ void Protect(edict_t* ent)
 	// (inBattle==1) {
 		strcpy(message, "You used protect!");
 		Protection = true;
-		enemyTurn(ent,&message);
+		enemyTurn(ent,1);
 //	}
 }
 
@@ -1140,7 +1158,7 @@ void SwordsDance(edict_t* ent)
 	//if (inBattle==1) {
 		strcpy(message, "You used swords dance!");
 		attackPower += 10;
-		enemyTurn(ent,message);
+		enemyTurn(ent,2);
 	//}
 }
 void Growl(edict_t* ent)
@@ -1149,7 +1167,7 @@ void Growl(edict_t* ent)
 	//{
 		strcpy(message, "You used growl!");
 		enemyAttack -= 10;
-		enemyTurn(ent,message);
+		enemyTurn(ent,3);
 	//}
 }
 
@@ -1324,16 +1342,50 @@ void ClientCommand (edict_t *ent)
 		Growl(ent);
 	else if (Q_stricmp(cmd, "swordsdance") == 0)
 		SwordsDance(ent);
+	else if (Q_stricmp(cmd, "healshop") == 0)
+	{
+		ent->health = 100;
+		if (wins == true)
+		{
+			pb = true;
+			wb = true;
+			ae = true;
+			gs = true;
+			om = true;
+		}
+	}
 	else if (Q_stricmp(cmd, "protectionbreaker") == 0)
-		protectionBreaker(ent);
+	{
+			protectionBreaker(ent);
+	}
 	else if (Q_stricmp(cmd, "willbreaker") == 0)
-		willBreaker(ent);
+	{
+		if (wb == true)
+		{
+			willBreaker(ent);
+		}
+	}
 	else if (Q_stricmp(cmd, "attackenhancer") == 0)
-		attackEnhancer(ent);
+	{
+		if (ae == true)
+		{
+			attackEnhancer(ent);
+		}
+	}
 	else if (Q_stricmp(cmd, "geminisplit") == 0)
-		geminiSplit(ent);
+	{
+		if (gs == true)
+		{
+			geminiSplit(ent);
+		}
+	}
 	else if (Q_stricmp(cmd, "olympicmead") == 0)
-		olympicMead(ent);
+	{
+		if (om == true)
+		{
+			olympicMead(ent);
+		}
+	}
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }
