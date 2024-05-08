@@ -301,15 +301,18 @@ Draw help computer.
 */
 void HelpComputer (edict_t *ent)
 {
+	strcpy(game.helpmessage1, "Actions: 'H' Healshop 'J' Spawn New Mon 'K' Catch 'L' Battle\n Win a match and use healshop to get items on '6,7,8,9,0'");
+	strcpy(game.helpmessage2, "Battle Moves: '2' tackle '3' protect '4' growl '5' swords dance\n use strategy to win against your opponent! ");
+	strcpy(level.level_name, "How to Play: ");
 	char	string[1024];
 	char	*sk;
 
 	if (skill->value == 0)
-		sk = "easy";
+		sk = "easy"; 
 	else if (skill->value == 1)
 		sk = "medium";
 	else if (skill->value == 2)
-		sk = "hard";
+		sk = "hard"; 
 	else
 		sk = "hard+";
 
