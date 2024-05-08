@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_local.h"
 #include "m_player.h"
 
-
+int monCalled = 0;
 
 char *ClientTeam (edict_t *ent)
 {
@@ -901,6 +901,22 @@ void Cmd_PlayerList_f(edict_t *ent)
 }
 
 
+void despawnAll()
+{
+	edict_t* ent;
+	for (int i = 0; i < globals.max_edicts; i++)
+	{
+		if (!g_edicts[i].inuse)
+			continue;
+		if (strcmp(g_edicts[i].classname, "NULL") == 0)
+		{
+			continue;
+		}
+		ent = &g_edicts[i];
+		G_FreeEdict(ent);
+	}
+}
+
 void SpawnMon(edict_t* mon, edict_t* ent)
 {
 	vec3_t monloc = { 0,0,0 };
@@ -1007,12 +1023,14 @@ void ClientCommand (edict_t *ent)
 		Cmd_PlayerList_f(ent);
 	else if (Q_stricmp(cmd, "spawn") == 0)
 	{
+		ent->flags = FL_NOTARGET;
+		despawnAll();
 		edict_t* mon;
 		char monName[] = "";
 		int ranNum = rand() % 10;
-		if(ranNum == 0)
+		if (ranNum == 0)
 			strcpy(monName, "monster_mutant");
-		else if(ranNum == 1)
+		else if (ranNum == 1)
 			strcpy(monName, "monster_floater");
 		else if (ranNum == 2)
 			strcpy(monName, "monster_hover");
@@ -1032,7 +1050,7 @@ void ClientCommand (edict_t *ent)
 			strcpy(monName, "monster_gunner");
 		mon = G_Spawn();
 		mon->classname = monName;
-		SpawnMon(mon,ent);
+		SpawnMon(mon, ent);
 	}
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
