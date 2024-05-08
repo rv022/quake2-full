@@ -19,10 +19,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #include "g_local.h"
 #include "m_player.h"
+#include <stdbool.h>
 
 char monName[] = "";
 int ranNum;
+int monNum;
 char capturedMonName[] = "";
+bool canSpawnMon = true;
+int enemyHealth_amount = 100;
+bool inBattle = false;
+int enemyAttack = 1;
+int attackPower = 1;
+int wins = 0;
+bool start = true;
+bool enemyProtection = false;
+bool Protection = false;
+char message[] = "";
+char enemyMessage[] = "";
+int brokenProtection = false;
 
 char *ClientTeam (edict_t *ent)
 {
@@ -919,7 +933,7 @@ void despawnAll()
 	}
 }
 
-void SpawnMon(edict_t* mon, edict_t* ent)
+void SpawnMon(edict_t* spawnedMon, edict_t* ent)
 {
 	vec3_t monloc = { 0,0,0 };
 	AngleVectors(ent->s.angles, monloc, NULL, NULL);
@@ -927,10 +941,217 @@ void SpawnMon(edict_t* mon, edict_t* ent)
 	monloc[1] *= 100;
 	monloc[2] *= 100;
 	VectorAdd(ent->s.origin, monloc, monloc);
-	VectorCopy(monloc, mon->s.origin);
-	ED_CallSpawn(mon);
+	VectorCopy(monloc, spawnedMon->s.origin);
+	ED_CallSpawn(spawnedMon);
 }
 
+void SpawnCapturedMon(edict_t* capturedMon, edict_t* ent)
+{
+	vec3_t monloc = { 0,0,0 };
+	AngleVectors(ent->s.angles, monloc, NULL, NULL);
+	monloc[0] *= 100;
+	monloc[1] *= 100;
+	monloc[2] *= 100;
+	VectorAdd(ent->s.origin, monloc, monloc);
+	VectorCopy(monloc, capturedMon->s.origin);
+	ED_CallSpawn(capturedMon);
+}
+
+void enemyTurn(edict_t* ent, char move[])
+{
+	//if (inBattle == 1)
+	//{
+		int enemyDecision = rand() % 4;
+		if (enemyDecision == 0)
+		{
+			//enemy
+			strcpy(enemyMessage, "They used tackle!");
+			strcat(move, enemyMessage);
+			gi.centerprintf(ent, move);
+			if (!Protection)
+			{
+				ent->health -= abs((25 + enemyAttack));
+			}
+			else
+				Protection = false;
+		}
+		if (enemyDecision == 1)
+		{
+			if (brokenProtection)
+			{
+				//enemy
+				strcpy(enemyMessage, "They couldn't use protect!");
+				strcat(move, enemyMessage);
+				gi.centerprintf(ent, move);
+			}
+			else
+			{
+				//enemy
+				strcpy(enemyMessage, "They used protect!");
+				strcat(move, enemyMessage);
+				gi.centerprintf(ent, move);
+				enemyProtection = true;
+			}
+		}
+		if (enemyDecision == 2)
+		{
+			//enemy
+			strcpy(enemyMessage, "They used swords dance!");
+			strcat(move, enemyMessage);
+			gi.centerprintf(ent, move);
+			enemyAttack += 10;
+		}
+		if (enemyDecision == 3)
+		{
+			//enemy
+			strcpy(enemyMessage, "They used growl!");
+			strcat(move, enemyMessage);
+			gi.centerprintf(ent, move);
+			attackPower -= 10;
+		}
+	//
+}
+
+void startQuakeBattle(edict_t* ent)
+{
+	//if (inBattle==0)
+	//{
+		strcpy(message, "Battle Start");
+		gi.centerprintf(ent, message);
+		enemyHealth_amount = 100;
+		//inBattle = 1;
+		enemyAttack = 1;
+		attackPower = 1;
+		enemyProtection = false;
+		Protection = false;
+		brokenProtection = false;
+	//}
+}
+/*
+void shopRewards()
+{
+	idPlayer* player;
+	player = gameLocal.GetLocalPlayer();
+	if (wins == 1 && player->health == 100)
+		player->GiveItem("weapon_nailgun");
+	if (wins == 2 && player->health == 100)
+		player->GiveItem("weapon_rocketlauncher");
+	if (wins == 3 && player->health == 100)
+		player->GiveItem("weapon_railgun");
+	if (wins == 4 && player->health == 100)
+		player->GiveItem("weapon_lightninggun");
+	if (wins == 5 && player->health == 100)
+		player->GiveItem("weapon_napalmgun");
+}
+*/
+void protectionBreaker(edict_t* ent)
+{
+	strcpy(message, "Protection breaker used!");
+	brokenProtection = true;
+	enemyTurn(ent, message);
+	enemyTurn(ent, message);
+}
+
+void willBreaker(edict_t* ent)
+{
+	strcpy(message, "Will breaker used!");
+	enemyAttack -= 25;
+	enemyTurn(ent, message);
+	enemyTurn(ent, message);
+}
+
+void attackEnhancer(edict_t* ent)
+{
+	strcpy(message, "Attack enhancer used!");
+	attackPower += 25;
+	enemyTurn(ent, message);
+	enemyTurn(ent, message);
+}
+
+
+void geminiSplit(edict_t* ent)
+{
+	strcpy(message, "Gemini split used!");
+	enemyHealth_amount -= abs((2 * (25 + attackPower)));
+	enemyTurn(ent, message);
+	enemyTurn(ent, message);
+}
+
+void olympicMead(edict_t* ent)
+{
+	strcpy(message, "Olympic mead used!");
+	ent->health = 200;
+	enemyTurn(ent,message);
+	enemyTurn(ent,message);
+}
+void Tackle(edict_t* ent)
+{
+	//if (inBattle == 1) {
+		char tackle[] = "You used tackle!";
+		if (enemyHealth_amount > 0 && !enemyProtection)
+		{
+			enemyHealth_amount -= abs(25 + attackPower);
+			if (enemyHealth_amount <= 0)
+			{
+				strcpy(message, "You won!");
+				wins += 1;
+				gi.centerprintf(ent, message);
+				//strcpy(enemyMessage, "");
+				//UpdateEnemyBattleInfo(player->hud);
+				inBattle = 0;
+				despawnAll();
+				//spawnWildMon();
+				canSpawnMon = 1;
+			}
+			enemyTurn(ent,tackle);
+		}
+		else if (enemyProtection)
+		{
+			enemyProtection = false;
+			enemyTurn(ent,message);
+		}
+		else
+		{
+			strcpy(message, "You won!");
+			wins += 1;
+			gi.centerprintf(ent, message);
+			//strcpy(enemyMessage, "");
+			//UpdateEnemyBattleInfo(player->hud);
+			inBattle = 0;
+			despawnAll();
+			//spawnWildMon();
+			canSpawnMon = 1;
+		}
+	//}
+}
+void Protect(edict_t* ent)
+{
+	edict_t* thisEnt = ent;
+	// (inBattle==1) {
+		strcpy(message, "You used protect!");
+		Protection = true;
+		enemyTurn(ent,&message);
+//	}
+}
+
+
+void SwordsDance(edict_t* ent)
+{
+	//if (inBattle==1) {
+		strcpy(message, "You used swords dance!");
+		attackPower += 10;
+		enemyTurn(ent,message);
+	//}
+}
+void Growl(edict_t* ent)
+{
+	//if (inBattle==1)
+	//{
+		strcpy(message, "You used growl!");
+		enemyAttack -= 10;
+		enemyTurn(ent,message);
+	//}
+}
 
 /*
 =================
@@ -1025,9 +1246,10 @@ void ClientCommand (edict_t *ent)
 		Cmd_PlayerList_f(ent);
 	else if (Q_stricmp(cmd, "spawn") == 0)
 	{
-
+		//inBattle = 0;
 		ent->flags = FL_NOTARGET;
 		despawnAll();
+		canSpawnMon = 1;
 		edict_t* mon;
 		ranNum = rand() % 10;
 		if (ranNum == 0)
@@ -1056,35 +1278,62 @@ void ClientCommand (edict_t *ent)
 	}
 	else if (Q_stricmp(cmd, "capture") == 0)
 	{
+		//inBattle = 0;
+		monNum = ranNum;
+		strcpy(message, "Captured Mon!");
+		gi.centerprintf(ent, message);
+		//strcpy(enemyMessage, "");
+		//UpdateEnemyBattleInfo(player->hud);
 		despawnAll();
-		if (ranNum == 0)
-			strcpy(capturedMonName, "monster_mutant");
-		else if (ranNum == 1)
-			strcpy(capturedMonName, "monster_floater");
-		else if (ranNum == 2)
-			strcpy(capturedMonName, "monster_hover");
-		else if (ranNum == 3)
-			strcpy(capturedMonName, "monster_tank");
-		else if (ranNum == 4)
-			strcpy(capturedMonName, "monster_gladiator");
-		else if (ranNum == 5)
-			strcpy(capturedMonName, "monster_chick");
-		else if (ranNum == 6)
-			strcpy(capturedMonName, "monster_flyer");
-		else if (ranNum == 7)
-			strcpy(capturedMonName, "monster_parasite");
-		else if (ranNum == 8)
-			strcpy(capturedMonName, "monster_medic");
-		else if (ranNum == 9)
-			strcpy(capturedMonName, "monster_gunner");
+		
 	}
 	else if (Q_stricmp(cmd, "battle") == 0)
 	{
+		if (monNum == 0)
+			strcpy(capturedMonName, "monster_mutant");
+		else if (monNum == 1)
+			strcpy(capturedMonName, "monster_floater");
+		else if (monNum == 2)
+			strcpy(capturedMonName, "monster_hover");
+		else if (monNum == 3)
+			strcpy(capturedMonName, "monster_tank");
+		else if (monNum == 4)
+			strcpy(capturedMonName, "monster_gladiator");
+		else if (monNum == 5)
+			strcpy(capturedMonName, "monster_chick");
+		else if (monNum == 6)
+			strcpy(capturedMonName, "monster_flyer");
+		else if (monNum == 7)
+			strcpy(capturedMonName, "monster_parasite");
+		else if (monNum == 8)
+			strcpy(capturedMonName, "monster_medic");
+		else if (monNum == 9)
+			strcpy(capturedMonName, "monster_gunner");
 		edict_t* capturedMon;
 		capturedMon = G_Spawn();
 		capturedMon->classname = capturedMonName;
-		SpawnMon(capturedMon, ent);
+		if(canSpawnMon == 1)
+			SpawnCapturedMon(capturedMon, ent);
+		startQuakeBattle(ent);
 	}
+	else if (Q_stricmp(cmd, "tackle") == 0)
+		Tackle(ent);
+	else if (Q_stricmp(cmd, "protect") == 0)
+		Protect(ent);
+	else if (Q_stricmp(cmd, "growl") == 0)
+		Growl(ent);
+	else if (Q_stricmp(cmd, "swordsdance") == 0)
+		SwordsDance(ent);
+	else if (Q_stricmp(cmd, "protectionbreaker") == 0)
+		protectionBreaker(ent);
+	else if (Q_stricmp(cmd, "willbreaker") == 0)
+		willBreaker(ent);
+	else if (Q_stricmp(cmd, "attackenhancer") == 0)
+		attackEnhancer(ent);
+	else if (Q_stricmp(cmd, "geminisplit") == 0)
+		geminiSplit(ent);
+	else if (Q_stricmp(cmd, "olympicmead") == 0)
+		olympicMead(ent);
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }
