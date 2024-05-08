@@ -20,7 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_local.h"
 #include "m_player.h"
 #include <stdbool.h>
-
+edict_t* mon;
+edict_t* capturedMon;
 char monName[] = "";
 int ranNum;
 int monNum;
@@ -31,7 +32,7 @@ char enemyHealthText[] = "";
 bool inBattle = false;
 int enemyAttack = 1;
 int attackPower = 1;
-bool wins = false;
+bool monwins = false;
 bool pb = false;
 bool wb = false;
 bool ae = false;
@@ -1062,13 +1063,13 @@ void startQuakeBattle(edict_t* ent)
 
 void protectionBreaker(edict_t* ent)
 {
-	if (pb == true)
-	{
+	//if (monwins == true)
+	//{
 		strcpy(message, "Protection breaker used!");
 		bProtection = true;
 		enemyTurn(ent, 4);
 		enemyTurn(ent, 4);
-	}
+	//}
 }
 
 void willBreaker(edict_t* ent)
@@ -1113,7 +1114,7 @@ void Tackle(edict_t* ent)
 			{
 				strcpy(message, "You won!");
 				gi.centerprintf(ent, message);
-				wins = true;
+				monwins = true;
 				//strcpy(enemyMessage, "");
 				//UpdateEnemyBattleInfo(player->hud);
 				inBattle = 0;
@@ -1132,7 +1133,7 @@ void Tackle(edict_t* ent)
 		{
 			strcpy(message, "You won!");
 			gi.centerprintf(ent, message);
-			wins = true;
+			monwins = true;
 			//strcpy(enemyMessage, "");
 			//UpdateEnemyBattleInfo(player->hud);
 			//inBattle = 0;
@@ -1268,7 +1269,6 @@ void ClientCommand (edict_t *ent)
 		ent->flags = FL_NOTARGET;
 		despawnAll();
 		canSpawnMon = 1;
-		edict_t* mon;
 		ranNum = rand() % 10;
 		if (ranNum == 0)
 			strcpy(monName, "monster_mutant");
@@ -1327,11 +1327,9 @@ void ClientCommand (edict_t *ent)
 			strcpy(capturedMonName, "monster_medic");
 		else if (monNum == 9)
 			strcpy(capturedMonName, "monster_gunner");
-		edict_t* capturedMon;
 		capturedMon = G_Spawn();
 		capturedMon->classname = capturedMonName;
-		if(canSpawnMon == 1)
-			SpawnCapturedMon(capturedMon, ent);
+		SpawnCapturedMon(capturedMon, ent);
 		startQuakeBattle(ent);
 	}
 	else if (Q_stricmp(cmd, "tackle") == 0)
@@ -1345,14 +1343,14 @@ void ClientCommand (edict_t *ent)
 	else if (Q_stricmp(cmd, "healshop") == 0)
 	{
 		ent->health = 100;
-		if (wins == true)
-		{
+		//if (monwins == true)
+		//{
 			pb = true;
 			wb = true;
 			ae = true;
 			gs = true;
 			om = true;
-		}
+		//}
 	}
 	else if (Q_stricmp(cmd, "protectionbreaker") == 0)
 	{
@@ -1360,31 +1358,31 @@ void ClientCommand (edict_t *ent)
 	}
 	else if (Q_stricmp(cmd, "willbreaker") == 0)
 	{
-		if (wb == true)
-		{
+		//if (monwins == true)
+		//{
 			willBreaker(ent);
-		}
+		//}
 	}
 	else if (Q_stricmp(cmd, "attackenhancer") == 0)
 	{
-		if (ae == true)
-		{
+		//if (monwins == true)
+		//{
 			attackEnhancer(ent);
-		}
+		//}
 	}
 	else if (Q_stricmp(cmd, "geminisplit") == 0)
 	{
-		if (gs == true)
-		{
+		//if (monwins == true)
+		//{
 			geminiSplit(ent);
-		}
+		//}
 	}
 	else if (Q_stricmp(cmd, "olympicmead") == 0)
 	{
-		if (om == true)
-		{
+		//if (monwins == true)
+		//{
 			olympicMead(ent);
-		}
+		//}
 	}
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
