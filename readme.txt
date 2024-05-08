@@ -1,29 +1,177 @@
 
-This is the complete source code for Quake 2, version 3.19, buildable with
-visual C++ 6.0.  The linux version should be buildable, but we haven't
-tested it for the release.
+Project Title: Quakemon 2 A mod which incorporates Pokemon inspired gameplay into Quake 2. Once you start a single player game, the f1 button will show you the controls on how to play, which I will go over now in more detail.
 
-The code is all licensed under the terms of the GPL (gnu public license).  
-You should read the entire license, but the gist of it is that you can do 
-anything you want with the code, including sell your new version.  The catch 
-is that if you distribute new binary versions, you are required to make the 
-entire source code available for free to everyone.
+How to install: Download the files and make a folder in your Quake 2 folder. Then, make a build from game in the files using something like visual studio, and have that build go to that folder you created. In the folder, then duplicate the config file and call it autoexec. Here, you can copy paste the autoexec text I have below the how to play section. After that, you should be set, enjoy the Dosgg region! 
 
-The primary intent of this release is for entertainment and educational 
-purposes, but the GPL does allow commercial exploitation if you obey the 
-full license.  If you want to do something commercial and you just can't bear 
-to have your source changes released, we could still negotiate a separate 
-license agreement (for $$$), but I would encourage you to just live with the 
-GPL.
+How to Play: Spawn Mon Button 'J': By pressing J, you can spawn in a new mon. This can be done during a battle, or just continuously to cycle through the 10 available mons until you reach one you would like to interact with.
 
-All of the Q2 data files remain copyrighted and licensed under the 
-original terms, so you cannot redistribute data from the original game, but if 
-you do a true total conversion, you can create a standalone game based on 
-this code.
+Capture Button 'K': By pressing K, you will catch the mon that you are seeing in front of you. Beware though, you can only have one mon caught at a time, and once you catch a new mon, it overrides your past mon. A "Catched mon" text will show up on the screen when you catch a mon.
 
-Thanks to Robert Duffy for doing the grunt work of building this release.
+Turn Based Battle Button 'L': By pressing L, you release your captured mon and are in the turn based battle phase, shown by the "Battle Start" in the middle of the screen, you can either catch, fight, or run from the wild monster. Catch: Press K. Your previous mon would be replaced by this one since you can only have one mon at a time, but you can switch them as much as you like.
 
-John Carmack
-Id Software
+Fight: On the bottom middle of your screen, you can see your mon's health, and on the right side of the text that shows up with each move, you can see your opponent's health. On the middle, you can also see text of what move you just did and what move the opponent just did. You can choose from 4 moves which can be used by pressing the buttons 2,3,4,5. Simply press the button of the move you want to use, they are in the following order and will be on the help screen if you need a reminder. The 4 moves are:
 
+Tackle - a normal attack which just subtracts some health from the opponent. Protect - a defensive attack which protects you from the next attack your opponent throws. Swords Dance - a supportive attack which increases the amount of damage you do to the opponent. Growl - a attack which decreases the amount of damage your opponent does to you.
+
+Each time you use a move, the opponent then also uses one of these four moves on you, and this will all be shown in the text on the middle of the screen. The fight will continue until one of the mons runs out of health. If they lose, you win, if you lose, you need to reload at a save in the heal shop so your mon can be healed.
+
+Run: If you are in the turn battle phase and don't want to fight, just press J and a new mon will appear.
+
+HealShop: Heal: If you press 'H', you will use the healshop which will heal your mon. If you ever lose a battle, you will load up in the heal shop since it heals you. If your mons are just weak, press H to heal your mon back to full health.
+
+Shop: If you press H and open the healshop with a win, you gain access to 5 items. 
+
+Items: There are 5 items which you can get from the healshop. You get all 5 after engaging in the healshop with a win. Keep in mind, while items are powerful, they let opponents attack you twice since you have to focus to use them. They are also represented as buttons like the moves, this time being the buttons 6,7,8,9,0. Just click the button of the item you want to use. The items are as follows, and in the following order. Protection Breaker: This item takes away the ability for a mon to use Protect for the rest of the fight. Will Breaker: This item greatly lowers the attack of the opposing mon.  Attack Enhancer: This item greatly increases the attack of your mon. Gemini Split: This item lets your mon do an attack worth twice the damage. Olympic Mead: This item heals your mon to double it's normal health.
+
+Fight and catch mons to your heart's content!
+
+Your grand adventure in the Dosgg region awaits!
+
+Copy paste the following into autoexec:
+
+// generated by quake, do not modify
+bind TAB "inven"
+bind ENTER "invuse"
+bind ESCAPE "togglemenu"
+bind SPACE "+moveup"
+bind ' "invdrop"
+bind + "sizeup"
+bind , "+moveleft"
+bind - "sizedown"
+bind . "+moveright"
+bind / "weapnext"
+bind 0 "olympicmead"
+bind 1 "use Blaster"
+bind 2 "tackle"
+bind 3 "protect"
+bind 4 "growl"
+bind 5 "swordsdance"
+bind 6 "protectionbreaker"
+bind 7 "willbreaker"
+bind 8 "attackenhancer"
+bind 9 "geminisplit"
+bind = "sizeup"
+bind [ "invprev"
+bind \ "+mlook"
+bind ] "invnext"
+bind ` "toggleconsole"
+bind a "+moveleft"
+bind b "spawn"
+bind c "+movedown"
+bind d "+moveright"
+bind e "enemyTurn"
+bind g "use grenades"
+bind h "healshop"
+bind i "healshop"
+bind j "spawn"
+bind k "capture"
+bind l "battle"
+bind p "use power shield"
+bind q "use quad damage"
+bind s "+back"
+bind t "messagemode"
+bind u "wave 4"
+bind w "+forward"
+bind x "score"
+bind z "+lookdown"
+bind ~ "toggleconsole"
+bind BACKSPACE "invdrop"
+bind UPARROW "+forward"
+bind DOWNARROW "+back"
+bind LEFTARROW "+left"
+bind RIGHTARROW "+right"
+bind ALT "+strafe"
+bind CTRL "+attack"
+bind SHIFT "+speed"
+bind F1 "cmd help"
+bind F2 "menu_savegame"
+bind F3 "menu_loadgame"
+bind F4 "menu_keys"
+bind F5 "menu_startserver"
+bind F6 "echo Quick Saving...; wait; save quick"
+bind F9 "echo Quick Loading...; wait; load quick"
+bind F10 "menu_quit"
+bind F12 "screenshot"
+bind INS "+klook"
+bind DEL "+lookdown"
+bind PGDN "+lookup"
+bind END "centerview"
+bind MOUSE1 "+attack"
+bind MOUSE2 "+strafe"
+bind MOUSE3 "+forward"
+bind MWHEELDOWN "weapnext"
+bind MWHEELUP "weapnext"
+bind PAUSE "pause"
+set gl_3dlabs_broken "1"
+set gl_swapinterval "1"
+set gl_ext_compiled_vertex_array "1"
+set gl_ext_pointparameters "1"
+set gl_ext_multitexture "1"
+set gl_ext_swapinterval "1"
+set gl_vertex_arrays "0"
+set gl_texturesolidmode "default"
+set gl_texturealphamode "default"
+set gl_texturemode "GL_LINEAR_MIPMAP_NEAREST"
+set gl_shadows "0"
+set gl_modulate "1"
+set gl_particle_att_c "0.01"
+set gl_particle_att_b "0.0"
+set gl_particle_att_a "0.01"
+set gl_particle_size "40"
+set gl_particle_max_size "40"
+set gl_particle_min_size "2"
+set gl_finish "0"
+set gl_ext_palettedtexture "1"
+set gl_mode "8"
+set gl_driver "opengl32"
+set hostname "noname"
+set allow_download "1"
+set allow_download_players "0"
+set allow_download_models "1"
+set allow_download_sounds "1"
+set allow_download_maps "1"
+set sv_reconnect_limit "3"
+set vid_ref "gl"
+set vid_xpos "113"
+set vid_ypos "0"
+set vid_gamma "1"
+set sw_stipplealpha "0"
+set s_volume "0.7"
+set s_khz "22"
+set s_loadas8bit "0"
+set s_mixahead "0.2"
+set s_primary "0"
+set cd_nocd "0"
+set adr0 ""
+set adr1 ""
+set adr2 ""
+set adr3 ""
+set adr4 ""
+set adr5 ""
+set adr6 ""
+set adr7 ""
+set adr8 ""
+set cl_stereo_separation "0.4"
+set freelook "1"
+set rate "24900"
+set msg "1"
+set fov "90"
+set gender "male"
+set gender_auto "1"
+set cl_vwep "1"
+set in_mouse "1"
+set in_joystick "0"
+set g_select_empty "0"
+set skin "male/grunt"
+set name "Player"
+set lookstrafe "0"
+set lookspring "1"
+set m_pitch "0.022"
+set hand "0"
+set cl_run "0"
+set crosshair "1"
+set sensitivity "3"
+set win_noalttab "0"
+set vid_fullscreen "0"
+set viewsize "100"
 
