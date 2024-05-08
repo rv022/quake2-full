@@ -20,7 +20,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "g_local.h"
 #include "m_player.h"
 
-int monCalled = 0;
+char monName[] = "";
+int ranNum;
+char capturedMonName[] = "";
 
 char *ClientTeam (edict_t *ent)
 {
@@ -1023,11 +1025,11 @@ void ClientCommand (edict_t *ent)
 		Cmd_PlayerList_f(ent);
 	else if (Q_stricmp(cmd, "spawn") == 0)
 	{
+
 		ent->flags = FL_NOTARGET;
 		despawnAll();
 		edict_t* mon;
-		char monName[] = "";
-		int ranNum = rand() % 10;
+		ranNum = rand() % 10;
 		if (ranNum == 0)
 			strcpy(monName, "monster_mutant");
 		else if (ranNum == 1)
@@ -1051,6 +1053,37 @@ void ClientCommand (edict_t *ent)
 		mon = G_Spawn();
 		mon->classname = monName;
 		SpawnMon(mon, ent);
+	}
+	else if (Q_stricmp(cmd, "capture") == 0)
+	{
+		despawnAll();
+		if (ranNum == 0)
+			strcpy(capturedMonName, "monster_mutant");
+		else if (ranNum == 1)
+			strcpy(capturedMonName, "monster_floater");
+		else if (ranNum == 2)
+			strcpy(capturedMonName, "monster_hover");
+		else if (ranNum == 3)
+			strcpy(capturedMonName, "monster_tank");
+		else if (ranNum == 4)
+			strcpy(capturedMonName, "monster_gladiator");
+		else if (ranNum == 5)
+			strcpy(capturedMonName, "monster_chick");
+		else if (ranNum == 6)
+			strcpy(capturedMonName, "monster_flyer");
+		else if (ranNum == 7)
+			strcpy(capturedMonName, "monster_parasite");
+		else if (ranNum == 8)
+			strcpy(capturedMonName, "monster_medic");
+		else if (ranNum == 9)
+			strcpy(capturedMonName, "monster_gunner");
+	}
+	else if (Q_stricmp(cmd, "battle") == 0)
+	{
+		edict_t* capturedMon;
+		capturedMon = G_Spawn();
+		capturedMon->classname = capturedMonName;
+		SpawnMon(capturedMon, ent);
 	}
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
